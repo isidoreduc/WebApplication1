@@ -26,11 +26,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\app\components\about\about.component.ts" />
     <None Remove="ClientApp\src\app\components\quiz\quiz.component.ts" />
     <None Remove="ClientApp\src\app\services\quiz.service.ts" />
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\components\about\about.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\components\quiz\quiz.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\services\quiz.service.ts" />
   </ItemGroup>
