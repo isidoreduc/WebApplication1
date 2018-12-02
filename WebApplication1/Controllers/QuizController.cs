@@ -78,7 +78,7 @@ namespace WebApplication1.Controllers
             }
 
             // output result in Json format
-            return new JsonResult(sampleQuizzes, new Newtonsoft.Json.JsonSerializerSettings
+            return new JsonResult(sampleQuizzes, new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
             });

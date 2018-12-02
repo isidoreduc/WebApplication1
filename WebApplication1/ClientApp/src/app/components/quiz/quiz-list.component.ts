@@ -20,6 +20,9 @@ export class QuizListComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    console.log("QuizListComponent " +
+      " instantiated with the following class: "
+      + this.class);
     switch (this.class) {
       case "latest":
       default:

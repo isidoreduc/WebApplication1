@@ -1,35 +1,48 @@
 import { HttpClient } from "@angular/common/http";
-import { Inject, Injectable, Input } from "@angular/core";
+import { Inject, Injectable, Input, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
 
-
+//
 
 @Injectable()
-export class QuizService {
+export class QuizService  {
+    
+    
   quizUrl: string = "";
   @Input() class: string;
+  http1: HttpClient;
+  baseUrl1: string;
 
   constructor(private http: HttpClient,
     @Inject("BASE_URL") private baseUrl: string) {
-    this.quizUrl = baseUrl + "api/quiz/";
-    switch (this.class) {
-      case "latest":
-      default:
-        this.quizUrl += "Latest/5";
-        break;
-      case "byTitle":
+    this.http1 = http;
+    this.baseUrl1 = baseUrl;
 
-        this.quizUrl += "ByTitle/";
-        break;
-      case "random":
-
-        this.quizUrl += "Random/";
-        break;
-
-    }
+    
+    
 
   }
+
+ 
+
   getQuizzes(): Observable<Quiz[]> {
-    return this.http.get<Quiz[]>(this.quizUrl);
+    this.quizUrl = this.baseUrl1 + "api/quiz/";
+    //switch (this.class) {
+    //  case "latest":
+
+    //    this.quizUrl += "Latest/10";
+    //    break;
+    //  case "byTitle":
+
+    //    this.quizUrl += "ByTitle/";
+    //    break;
+    //  case "random":
+    //  //default:
+    //    this.quizUrl += "Random/";
+    //    break;
+    //}
+    //if (this.class == "latest")
+    //  this.quizUrl += "Latest/10";
+    return this.http.get<Quiz[]>(this.quizUrl + "Latest/10");
   }
 }
