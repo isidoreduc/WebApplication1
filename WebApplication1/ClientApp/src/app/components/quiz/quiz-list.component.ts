@@ -47,6 +47,7 @@ export class QuizListComponent implements OnInit{
         url += "Random/";
         break;
     }
+    // observable pattern
     this.http.get<Quiz[]>(url).subscribe(result =>
       this.quizzes = result,
       error => console.error(error));
