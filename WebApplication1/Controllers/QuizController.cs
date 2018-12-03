@@ -40,7 +40,7 @@ namespace WebApplication1.Controllers
             // create a sample quiz 
             var quiz = _dbContext.Quizzes.Where(i => i.Id == id).FirstOrDefault();
             return new JsonResult(
-                quiz.Adapt<QuizViewModel>(),
+                quiz.Adapt<QuizViewModel>(), // using Mapster (faster than AutoMapper) to map quiz properties to the QuizViewModel
                 new JsonSerializerSettings()
                 {
                     Formatting = Formatting.Indented
@@ -83,7 +83,10 @@ namespace WebApplication1.Controllers
             //        LastModifiedDate = DateTime.Now
             //    });
             //}
-            var latest = _dbContext.Quizzes.OrderByDescending(x => x.CreatedDate).Take(num).ToArray();
+            var latest = _dbContext.Quizzes
+                .OrderByDescending(x => x.CreatedDate)
+                .Take(num)
+                .ToArray();
             // output result in Json format
             return new JsonResult(
                 latest.Adapt<QuizViewModel[]>(), 
