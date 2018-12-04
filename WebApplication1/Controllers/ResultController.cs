@@ -42,7 +42,7 @@ namespace WebApplication1.Controllers
             {
                 return NotFound(new
                 {
-                    Error = String.Format("Result ID {0} has not been found", m.Id)
+                    Error = String.Format("Result ID {0} has not been found", id)
                 });
             }
             return new JsonResult(
@@ -103,7 +103,7 @@ namespace WebApplication1.Controllers
             {
                 return NotFound(new
                 {
-                    Error = String.Format("Result ID {0} has not been found", m.Id)
+                    Error = String.Format("Result ID {0} has not been found", model.Id)
                 });
             }
             // handle the update (without object-mapping)
