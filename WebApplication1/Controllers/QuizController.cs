@@ -18,7 +18,6 @@ namespace WebApplication1.Controllers
         #region Private Fields
         private ApplicationDbContext _dbContext;
         #endregion
-       
         #region Constructor
         public QuizController(ApplicationDbContext context)
         {
@@ -40,14 +39,6 @@ namespace WebApplication1.Controllers
         {
             // create a sample quiz 
             var quiz = _dbContext.Quizzes.Where(i => i.Id == id).FirstOrDefault();
-            // handle requests asking for non-existing quizzes
-            if (quiz == null) 
-                return NotFound(new
-                {
-                    Error = String.Format("Quiz ID {0} has not been found", id)
-                });
-            
-
             return new JsonResult(
                 quiz.Adapt<QuizViewModel>(), // using Mapster (faster than AutoMapper) to map quiz properties to the QuizViewModel
                 new JsonSerializerSettings()
@@ -55,120 +46,17 @@ namespace WebApplication1.Controllers
                     Formatting = Formatting.Indented
                 });
         }
+        #endregion
 
+        #region Attribute-based routing methods
         /// <summary>
-        /// Adds a new Quiz to the Database
+        /// GET: api/quiz/latest
+        /// Retrieves the {num} latest quizzes
         /// </summary>
-        /// <param name="model">The QuizViewModel containing the data to insert</param>
-        [HttpPost]
-        public IActionResult Post([FromBody] QuizViewModel model)
-        {
-            // return a generic HTTP Status 500 (Server Error)
-            // if the client payload is invalid.
-            if (model == null) return new StatusCodeResult(500);
-            // handle the insert (without object-mapping)
-            var quiz = new Quiz();
-            // properties taken from the request
-            quiz.Title = model.Title;
-            quiz.Description = model.Description;
-            quiz.Text = model.Text;
-            quiz.Notes = model.Notes;
-            // properties set from server-side
-            quiz.CreatedDate = DateTime.Now;
-            quiz.LastModifiedDate = quiz.CreatedDate;
-            // Set a temporary author using the Admin user's userId
-            // as user login isn't supported yet: we'll change this later on.
-            quiz.UserId = _dbContext.Users.Where(u => u.UserName == "Admin")
-                .FirstOrDefault().Id;
-            // add the new quiz
-            _dbContext.Quizzes.Add(quiz);
-            // persist the changes into the Database.
-            _dbContext.SaveChanges();
-            // return the newly-created Quiz to the client.
-            return new JsonResult(quiz.Adapt<QuizViewModel>(),
-                        new JsonSerializerSettings()
-                        {
-                            Formatting = Formatting.Indented
-                        });
-        }
-
-        /// <summary>
-        /// Edit the Quiz with the given {id}
-        /// </summary>
-        /// <param name="model">The QuizViewModel containing the data to update</param>
-        [HttpPut]
-        public IActionResult Put([FromBody]QuizViewModel model) // FromBody - tell .NET Core to fetch the QuizViewModel sent by our
-                                                                // Angular app--in JSON format--from the request body
-        {
-            // return a generic HTTP Status 500 (Server Error)
-            // if the client payload is invalid.
-            if (model == null) return new StatusCodeResult(500);
-            // retrieve the quiz to edit
-            var quiz = _dbContext.Quizzes.Where(q => q.Id ==
-                model.Id).FirstOrDefault();
-            // handle requests asking for non-existing quizzes
-            if (quiz == null)
-            {
-                return NotFound(new
-                {
-                    Error = String.Format("Quiz ID {0} has not been found",
-                         model.Id)
-                });
-            }
-            // handle the update (without object-mapping)
-            //   by manually assigning the properties
-            //   we want to accept from the request
-            quiz.Title = model.Title;
-            quiz.Description = model.Description;
-            quiz.Text = model.Text;
-            quiz.Notes = model.Notes;
-            // properties set from server-side
-            quiz.LastModifiedDate = quiz.CreatedDate;
-            // persist the changes into the Database.
-            _dbContext.SaveChanges();
-            // return the updated Quiz to the client.
-            return new JsonResult(quiz.Adapt<QuizViewModel>(), //return a new QuizViewModel to the client built upon the created Quiz
-                        new JsonSerializerSettings()
-                        {
-                            Formatting = Formatting.Indented
-                        });
-        }
-
-        /// <summary>
-        /// Deletes the Quiz with the given {id} from the Database
-        /// </summary>
-        /// <param name="id">The ID of an existing Test</param>
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-        {
-            // retrieve the quiz from the Database
-            var quiz = _dbContext.Quizzes.Where(i => i.Id == id)
-                .FirstOrDefault();
-            // handle requests asking for non-existing quizzes
-            if (quiz == null)
-                return NotFound(new
-                {
-                    Error = String.Format("Quiz ID {0} has not been found", id)
-                });
-            // remove the quiz from the DbContext.
-            _dbContext.Quizzes.Remove(quiz);
-            // persist the changes into the Database.
-            _dbContext.SaveChanges();
-            // return an HTTP Status 200 (OK).
-            return new OkResult();
-        }
-
-    #endregion
-
-    #region Attribute-based routing methods
-    /// <summary>
-    /// GET: api/quiz/latest
-    /// Retrieves the {num} latest quizzes
-    /// </summary>
-    /// <param name="num"> The number of quizzes to return </param>
-    /// <returns>{num} latest quizzes</returns>
-
-    [HttpGet("Latest/{num?}")] // num is optional, nullable
+        /// <param name="num"> The number of quizzes to return </param>
+        /// <returns>{num} latest quizzes</returns>
+        
+        [HttpGet("Latest/{num?}")] // num is optional, nullable
         public IActionResult Latest(int num = 10)
         {
             //var sampleQuizzes = new List<QuizViewModel>();
