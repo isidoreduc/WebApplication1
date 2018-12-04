@@ -1,37 +1,45 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WebApplication1.ViewModel
+namespace WebApplication1.Data
 {
-    [JsonObject(MemberSerialization.OptOut)]
-    public class ResultViewModel
+    public class Result
     {
         #region Constructor
-        public ResultViewModel()
+        public Result()
         {
-
         }
         #endregion
 
         #region Properties
+        [Key]
+        [Required]
         public int Id { get; set; }
-        public int QuizId { get; set; }
+        [Required]
+        public int QuizId { get; set; } //FK
+        [Required]
         public string Text { get; set; }
         public int? MinValue { get; set; }
         public int? MaxValue { get; set; }
-
         public string Notes { get; set; }
         [DefaultValue(0)]
         public int Type { get; set; }
         [DefaultValue(0)]
         public int Flags { get; set; }
-        [JsonIgnore]
+        [Required]
         public DateTime CreatedDate { get; set; }
+        [Required]
         public DateTime LastModifiedDate { get; set; }
+        #endregion
+
+        #region Lazy-Load Properties
+        /// <summary>
+        /// The parent quiz.
+        /// </summary>
+        [ForeignKey("QuizId")]
+        public virtual Quiz Quiz { get; set; }
         #endregion
     }
 }

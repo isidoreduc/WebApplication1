@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WebApplication1.Data;
 
 namespace WebApplication1
 {
@@ -27,6 +29,12 @@ namespace WebApplication1
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+            // Add EntityFramework support for SqlServer.
+            services.AddEntityFrameworkSqlServer();
+            // Add ApplicationDbContext.
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,6 +73,23 @@ namespace WebApplication1
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+
+ #region Database Seeding
+            // seeds the database - we could have easily injected Configure with a dbContext parameter and just 
+            // call Seed method in the DbSeeder static class. The alternative, to not change the parameter structure of Configure: 
+            // Create a service scope to get an ApplicationDbContext instance using Dep Inj
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                var dbContext = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
+                // Create the Db if it doesn't exist and applies any pending migration.
+                dbContext.Database.Migrate();
+                // Seed the Db.
+                DbSeeder.Seed(dbContext);
+            }
+#endregion
+
+
+
         }
     }
 }

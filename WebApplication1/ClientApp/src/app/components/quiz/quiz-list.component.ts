@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit, Input } from "@angular/core";
 import { QuizService } from "../../services/quiz.service";
 import { HttpClient } from "@angular/common/http";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "quiz-list",
@@ -18,7 +19,8 @@ export class QuizListComponent implements OnInit{
   //baseUrl: string;
 
   // dependency injection of the HttpClient to connect to api and of the base url(localhost:44349, in this instance)
-  constructor(private http: HttpClient,
+  constructor(private router: Router,
+    private http: HttpClient,
     @Inject('BASE_URL') private baseUrl: string) { // an explicit access modifier (private, here) makes parameters available in the whole class not just in the constructor, no need to create instances in order to access the parameters outside the constructor
     //this.http = http;
     //this.baseUrl = baseUrl;
@@ -58,5 +60,7 @@ export class QuizListComponent implements OnInit{
     console.log("quiz with Id "
       + this.selectedQuiz.Id
       + " has been selected.");
+
+    this.router.navigate(["quiz", this.selectedQuiz.Id]);
   }
 }
