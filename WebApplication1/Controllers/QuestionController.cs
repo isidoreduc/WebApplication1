@@ -13,18 +13,10 @@ using WebApplication1.ViewModel;
 namespace WebApplication1.Controllers
 {
     [Route("api/[controller]")]
-    public class QuestionController : Controller
+    public class QuestionController : BaseApiController
     {
-        #region Private Fields
-        private ApplicationDbContext _dbContext;
-        #endregion
-
         #region Constructor
-        public QuestionController(ApplicationDbContext context)
-        {
-            // Instantiate the Application_dbContext through DI
-            _dbContext = context;
-        }
+        public QuestionController(ApplicationDbContext context) : base(context) { }
         #endregion
 
         #region RESTful conventions methods
@@ -37,7 +29,7 @@ namespace WebApplication1.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var question = _dbContext.Questions.Where(i => i.Id == id)
+            var question = DbContext.Questions.Where(i => i.Id == id)
                 .FirstOrDefault();
             // handle requests asking for non-existing questions
             if (question == null)
@@ -49,12 +41,9 @@ namespace WebApplication1.Controllers
             }
             return new JsonResult(
                 question.Adapt<QuestionViewModel>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+                JsonSettings);
         }
-        #endregion M
+        #endregion Get Method
         #region Post Method
         
         /// <summary>
@@ -78,15 +67,13 @@ namespace WebApplication1.Controllers
             question.CreatedDate = DateTime.Now;
             question.LastModifiedDate = question.CreatedDate;
             // add the new question
-            _dbContext.Questions.Add(question);
+            DbContext.Questions.Add(question);
             // persist the changes into the Database.
-            _dbContext.SaveChanges();
+            DbContext.SaveChanges();
             // return the newly-created Question to the client.
-            return new JsonResult(question.Adapt<QuestionViewModel>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+            return new JsonResult(
+                question.Adapt<QuestionViewModel>(),
+                JsonSettings);
         }
         #endregion
         #region Put Method
@@ -101,7 +88,7 @@ namespace WebApplication1.Controllers
             // if the client payload is invalid.
             if (model == null) return new StatusCodeResult(500);
             // retrieve the question to edit
-            var question = _dbContext.Questions.Where(q => q.Id ==
+            var question = DbContext.Questions.Where(q => q.Id ==
                         model.Id).FirstOrDefault();
             // handle requests asking for non-existing questions
             if (question == null)
@@ -120,13 +107,10 @@ namespace WebApplication1.Controllers
             // properties set from server-side
             question.LastModifiedDate = question.CreatedDate;
             // persist the changes into the Database.
-            _dbContext.SaveChanges();
+            DbContext.SaveChanges();
             // return the updated Quiz to the client.
             return new JsonResult(question.Adapt<QuestionViewModel>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+                JsonSettings);
         }
         #endregion
         #region Delete Method
@@ -138,7 +122,7 @@ namespace WebApplication1.Controllers
         public IActionResult Delete(int id)
         {
             // retrieve the question from the Database
-            var question = _dbContext.Questions.Where(i => i.Id == id)
+            var question = DbContext.Questions.Where(i => i.Id == id)
                 .FirstOrDefault();
             // handle requests asking for non-existing questions
             if (question == null)
@@ -148,10 +132,10 @@ namespace WebApplication1.Controllers
                     Error = String.Format("Question ID {0} has not been found", id)
                 });
             }
-            // remove the quiz from the _dbContext.
-            _dbContext.Questions.Remove(question);
+            // remove the quiz from the DbContext.
+            DbContext.Questions.Remove(question);
             // persist the changes into the Database.
-            _dbContext.SaveChanges();
+            DbContext.SaveChanges();
             // return an HTTP Status 200 (OK).
             return new OkResult();
         }
@@ -162,13 +146,10 @@ namespace WebApplication1.Controllers
         [HttpGet("All/{quizId}")]
         public IActionResult All(int quizId)
         {
-            var questions = _dbContext.Questions.Where(question => question.Id == quizId).ToArray();
+            var questions = DbContext.Questions.Where(question => question.Id == quizId).ToArray();
             return new JsonResult(
                 questions.Adapt<QuestionViewModel[]>(),
-                new Newtonsoft.Json.JsonSerializerSettings()
-                {
-                    Formatting = Newtonsoft.Json.Formatting.Indented
-                });
+                JsonSettings);
         }
 
     }

@@ -13,17 +13,11 @@ using WebApplication1.ViewModel;
 namespace WebApplication1.Controllers
 {
     [Route("api/[controller]")]
-    public class QuizController : Controller
+    public class QuizController : BaseApiController
     {
-        #region Private Fields
-        private ApplicationDbContext _dbContext;
-        #endregion
+        
         #region Constructor
-        public QuizController(ApplicationDbContext context)
-        {
-            // Instantiate the ApplicationDbContext through DI
-            _dbContext = context;
-        }
+        public QuizController(ApplicationDbContext context) : base(context) { }
         #endregion Constructor
 
         #region RESTful conventions routing
@@ -38,7 +32,7 @@ namespace WebApplication1.Controllers
         public IActionResult Get(int id)
         {
             // create a sample quiz 
-            var quiz = _dbContext.Quizzes.Where(i => i.Id == id).FirstOrDefault();
+            var quiz = DbContext.Quizzes.Where(i => i.Id == id).FirstOrDefault();
             // handle requests asking for non-existing quizzes
             if (quiz == null)
             {
@@ -49,10 +43,7 @@ namespace WebApplication1.Controllers
             }
             return new JsonResult(
                 quiz.Adapt<QuizViewModel>(), // using Mapster (faster than AutoMapper) to map quiz properties to the QuizViewModel
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+                JsonSettings);
         }
 
         /// <summary>
@@ -77,18 +68,16 @@ namespace WebApplication1.Controllers
             quiz.LastModifiedDate = quiz.CreatedDate;
             // Set a temporary author using the Admin user's userId
             // as user login isn't supported yet: we'll change this later on.
-            quiz.UserId = _dbContext.Users.Where(u => u.UserName == "Admin")
+            quiz.UserId = DbContext.Users.Where(u => u.UserName == "Admin")
                 .FirstOrDefault().Id;
             // add the new quiz
-            _dbContext.Quizzes.Add(quiz);
+            DbContext.Quizzes.Add(quiz);
             // persist the changes into the Database.
-            _dbContext.SaveChanges();
+            DbContext.SaveChanges();
             // return the newly-created Quiz to the client.
-            return new JsonResult(quiz.Adapt<QuizViewModel>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+            return new JsonResult(
+                quiz.Adapt<QuizViewModel>(),
+                JsonSettings);
         }
 
         /// <summary>
@@ -102,7 +91,7 @@ namespace WebApplication1.Controllers
             // if the client payload is invalid.
             if (model == null) return new StatusCodeResult(500);
             // retrieve the quiz to edit
-            var quiz = _dbContext.Quizzes.Where(q => q.Id ==
+            var quiz = DbContext.Quizzes.Where(q => q.Id ==
                 model.Id).FirstOrDefault();
             // handle requests asking for non-existing quizzes
             if (quiz == null)
@@ -123,13 +112,11 @@ namespace WebApplication1.Controllers
             // properties set from server-side
             quiz.LastModifiedDate = quiz.CreatedDate;
             // persist the changes into the Database.
-            _dbContext.SaveChanges();
+            DbContext.SaveChanges();
             // return the updated Quiz to the client.
-            return new JsonResult(quiz.Adapt<QuizViewModel>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+            return new JsonResult(
+                quiz.Adapt<QuizViewModel>(),
+                JsonSettings);
         }
 
         /// <summary>
@@ -140,7 +127,7 @@ namespace WebApplication1.Controllers
         public IActionResult Delete(int id)
         {
             // retrieve the quiz from the Database
-            var quiz = _dbContext.Quizzes.Where(i => i.Id == id)
+            var quiz = DbContext.Quizzes.Where(i => i.Id == id)
                 .FirstOrDefault();
             // handle requests asking for non-existing quizzes
             if (quiz == null)
@@ -151,9 +138,9 @@ namespace WebApplication1.Controllers
                 });
             }
             // remove the quiz from the DbContext.
-            _dbContext.Quizzes.Remove(quiz);
+            DbContext.Quizzes.Remove(quiz);
             // persist the changes into the Database.
-            _dbContext.SaveChanges();
+            DbContext.SaveChanges();
             // return an HTTP Status 200 (OK).
             return new OkResult();
         }
@@ -195,17 +182,14 @@ namespace WebApplication1.Controllers
             //        LastModifiedDate = DateTime.Now
             //    });
             //}
-            var latest = _dbContext.Quizzes
+            var latest = DbContext.Quizzes
                 .OrderByDescending(x => x.CreatedDate)
                 .Take(num)
                 .ToArray();
             // output result in Json format
             return new JsonResult(
-                latest.Adapt<QuizViewModel[]>(), 
-                new JsonSerializerSettings
-                {
-                    Formatting = Formatting.Indented
-                });
+                latest.Adapt<QuizViewModel[]>(),
+                JsonSettings);
         }
 
         
@@ -232,16 +216,13 @@ namespace WebApplication1.Controllers
             //        Formatting = Formatting.Indented
             //    }
             //    );
-            var byTitle = _dbContext.Quizzes
+            var byTitle = DbContext.Quizzes
                 .OrderBy(q => q.Title)
                 .Take(num)
                 .ToArray();
             return new JsonResult(
                 byTitle.Adapt<QuizViewModel[]>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+                JsonSettings);
         }
 
         /*
@@ -263,17 +244,13 @@ namespace WebApplication1.Controllers
             //    as List<QuizViewModel>;
             //return new JsonResult(
             //    sampleQuizzes.OrderBy(t => Guid.NewGuid()),
-            var random = _dbContext.Quizzes
+            var random = DbContext.Quizzes
                 .OrderBy(q => Guid.NewGuid())
                 .Take(num)
                 .ToArray();
             return new JsonResult(
                 random.Adapt<QuizViewModel[]>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                }
-                );
+                JsonSettings);
         }
         #endregion
     }

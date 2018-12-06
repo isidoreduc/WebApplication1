@@ -13,17 +13,11 @@ using WebApplication1.ViewModel;
 namespace WebApplication1.Controllers
 {
     [Route("api/[controller]")]
-    public class AnswerController : Controller
+    public class AnswerController : BaseApiController
     {
-        #region Private Fields
-        private ApplicationDbContext DbContext;
-        #endregion
+        
         #region Constructor
-        public AnswerController(ApplicationDbContext context)
-        {
-            // Instantiate the ApplicationDbContext through DI
-            DbContext = context;
-        }
+        public AnswerController(ApplicationDbContext context) : base(context) { }
         #endregion
 
         #region RESTful conventions methods
@@ -48,10 +42,7 @@ namespace WebApplication1.Controllers
             }
             return new JsonResult(
                 answer.Adapt<AnswerViewModel>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+                JsonSettings);
         }
         #endregion
         #region Post
@@ -81,11 +72,9 @@ namespace WebApplication1.Controllers
             // persist the changes into the Database.
             DbContext.SaveChanges();
             // return the newly - created Answer to the client.
-            return new JsonResult(answer.Adapt<AnswerViewModel>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+            return new JsonResult(
+                answer.Adapt<AnswerViewModel>(),
+                JsonSettings);
         }
         #endregion
         #region Put
@@ -123,11 +112,9 @@ namespace WebApplication1.Controllers
             // persist the changes into the Database.
             DbContext.SaveChanges();
             // return the updated Quiz to the client.
-            return new JsonResult(answer.Adapt<AnswerViewModel>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+            return new JsonResult(
+                answer.Adapt<AnswerViewModel>(),
+                JsonSettings);
         }
         #endregion
         #region Delete
@@ -167,10 +154,7 @@ namespace WebApplication1.Controllers
             var answers = DbContext.Answers.Where(a => a.Id == questionId).ToArray();
             return new JsonResult(
                 answers.Adapt<AnswerViewModel[]>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Newtonsoft.Json.Formatting.Indented
-                });
+                JsonSettings);
         }
 
         

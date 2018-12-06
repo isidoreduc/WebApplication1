@@ -13,17 +13,11 @@ using WebApplication1.ViewModel;
 namespace WebApplication1.Controllers
 {
     [Route("api/[controller]")]
-    public class ResultController : Controller
+    public class ResultController : BaseApiController
     {
-        #region Private Fields
-        private ApplicationDbContext DbContext;
-#endregion
+        
         #region Constructor
-        public ResultController(ApplicationDbContext context)
-        {
-            // Instantiate the ApplicationDbContext through DI
-            DbContext = context;
-        }
+        public ResultController(ApplicationDbContext context) : base(context) {}
         #endregion
         #region RESTful conventions methods
         #region Get
@@ -47,10 +41,7 @@ namespace WebApplication1.Controllers
             }
             return new JsonResult(
                 result.Adapt<ResultViewModel>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+                JsonSettings);
         }
         #endregion
         #region Post
@@ -77,10 +68,7 @@ namespace WebApplication1.Controllers
             DbContext.SaveChanges();
             // return the newly-created Result to the client.
             return new JsonResult(result.Adapt<ResultViewModel>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+                JsonSettings);
         }
         #endregion
         #region Put
@@ -120,10 +108,7 @@ namespace WebApplication1.Controllers
             DbContext.SaveChanges();
             // return the updated Quiz to the client.
             return new JsonResult(result.Adapt<ResultViewModel>(),
-                new JsonSerializerSettings()
-                {
-                    Formatting = Formatting.Indented
-                });
+                JsonSettings);
         }
         #endregion
         #region Delete
@@ -162,10 +147,7 @@ namespace WebApplication1.Controllers
         {
             var results = DbContext.Results.Where(r => r.Id == quizId).ToArray();
             return new JsonResult(results.Adapt<ResultViewModel>(),
-                new Newtonsoft.Json.JsonSerializerSettings()
-                {
-                    Formatting = Newtonsoft.Json.Formatting.Indented
-                });
+                JsonSettings);
         }
     }
 }
