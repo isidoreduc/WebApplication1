@@ -139,14 +139,17 @@ namespace WebApplication1.Controllers
         }
         #endregion
         #endregion
-        
-        
-        // GET: api/answer/all
+
+
+        // GET api/result/all
         [HttpGet("All/{quizId}")]
         public IActionResult All(int quizId)
         {
-            var results = DbContext.Results.Where(r => r.Id == quizId).ToArray();
-            return new JsonResult(results.Adapt<ResultViewModel>(),
+            var results = DbContext.Results
+                .Where(q => q.QuizId == quizId)
+                .ToArray();
+            return new JsonResult(
+                results.Adapt<ResultViewModel[]>(),
                 JsonSettings);
         }
     }

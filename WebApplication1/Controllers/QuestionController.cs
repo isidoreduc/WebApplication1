@@ -146,7 +146,7 @@ namespace WebApplication1.Controllers
         [HttpGet("All/{quizId}")]
         public IActionResult All(int quizId)
         {
-            var questions = DbContext.Questions.Where(question => question.Id == quizId).ToArray();
+            var questions = DbContext.Questions.Where(question => question.QuizId == quizId).ToArray();
             return new JsonResult(
                 questions.Adapt<QuestionViewModel[]>(),
                 JsonSettings);
