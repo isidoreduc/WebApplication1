@@ -151,7 +151,7 @@ namespace WebApplication1.Controllers
         [HttpGet("All/{questionId}")]
         public IActionResult All(int questionId)
         {
-            var answers = DbContext.Answers.Where(a => a.Id == questionId).ToArray();
+            var answers = DbContext.Answers.Where(a => a.QuestionId == questionId).ToArray();
             return new JsonResult(
                 answers.Adapt<AnswerViewModel[]>(),
                 JsonSettings);
