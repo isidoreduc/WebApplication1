@@ -5,15 +5,12 @@ quiz-list {
   margin: 0px 5px;
   float: left;
 }
-
-  quiz-list.latest {
-    background-color: #0094ff;
-  }
-
-  quiz-list.byTitle {
-    background-color: #ffd800;
-  }
-
-  quiz-list.random {
-    background-color: #ff0000;
-  }
+quiz-list.latest {
+  background-color: #0094ff;
+}
+quiz-list.byTitle {
+  background-color: #ffd800;
+}
+quiz-list.random {
+  background-color: #ff0000;
+}
